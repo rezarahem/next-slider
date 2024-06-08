@@ -1,4 +1,4 @@
-import Slider from '@/components/slider/slider-d';
+import SliderDragable from '@/components/slider/slider-dragable';
 
 const images = [
   'https://movie-app.storage.iran.liara.space/3444.jpg',
@@ -8,7 +8,7 @@ const images = [
 ];
 
 const HomePage = () => {
-  return <Slider images={images} heightInRem={30} />;
+  return <SliderDragable images={images} heightInRem={30} />;
 };
 
 export default HomePage;

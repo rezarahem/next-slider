@@ -11,7 +11,7 @@ type SliderProps = {
   widthInRem?: number;
 };
 
-const Slider = ({ images, heightInRem, widthInRem }: SliderProps) => {
+const SliderDragable = ({ images, heightInRem, widthInRem }: SliderProps) => {
   const [currentIndex, setCurrentIndex] = useState(images.length - 1);
   const [isDragging, setIsDragging] = useState(false);
   const [startPosition, setStartPosition] = useState(0);
@@ -180,4 +180,4 @@ const Slider = ({ images, heightInRem, widthInRem }: SliderProps) => {
   );
 };
 
-export default Slider;
+export default SliderDragable;
