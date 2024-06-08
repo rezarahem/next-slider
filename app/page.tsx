@@ -1,4 +1,4 @@
-import Slider from '@/components/slider/slider';
+import Slider from '@/components/slider/slider-d';
 
 const images = [
   'https://movie-app.storage.iran.liara.space/3444.jpg',
@@ -8,11 +8,7 @@ const images = [
 ];
 
 const HomePage = () => {
-  return (
-    <div>
-      <Slider images={images} />
-    </div>
-  );
+  return <Slider images={images} heightInRem={30} />;
 };
 
 export default HomePage;

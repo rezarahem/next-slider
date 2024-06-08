@@ -3,7 +3,7 @@
 import { cn } from '@/libs/utils';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 type SliderProps = {
   images: string[];
@@ -13,21 +13,86 @@ type SliderProps = {
 
 const Slider = ({ images, heightInRem, widthInRem }: SliderProps) => {
   const [currentIndex, setCurrentIndex] = useState(images.length - 1);
+  const [isDragging, setIsDragging] = useState(false);
+  const [startPosition, setStartPosition] = useState(0);
+  const sliderRef = useRef<HTMLDivElement>(null);
 
   const nextSlide = () => {
-    setCurrentIndex((prev) => (prev > 0 ? prev - 1 : images.length - 1)); //
+    setCurrentIndex((prev) => (prev > 0 ? prev - 1 : images.length - 1));
   };
 
   const previousSlide = () => {
     setCurrentIndex((prev) => (prev < images.length - 1 ? prev + 1 : 0));
   };
 
-  useEffect(() => {
-    const interval = setInterval(() => {
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     if (!isDragging) {
+  //       nextSlide();
+  //     }
+  //   }, 3000);
+  //   return () => clearInterval(interval); // Cleanup interval on component unmount
+  // }, [isDragging]);
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    setIsDragging(true);
+    setStartPosition(e.clientX);
+  };
+
+  const handleMouseMove = (e: MouseEvent) => {
+    if (!isDragging) return;
+    const distance = e.clientX - startPosition;
+    if (distance > 50) {
+      previousSlide();
+      setIsDragging(false);
+    } else if (distance < -50) {
       nextSlide();
-    }, 3000);
-    return () => clearInterval(interval); // Cleanup interval on component unmount
-  }, []);
+      setIsDragging(false);
+    }
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setIsDragging(true);
+    setStartPosition(e.touches[0].clientX);
+  };
+
+  const handleTouchMove = (e: TouchEvent) => {
+    if (!isDragging) return;
+    const distance = e.touches[0].clientX - startPosition;
+    if (distance > 50) {
+      previousSlide();
+      setIsDragging(false);
+    } else if (distance < -50) {
+      nextSlide();
+      setIsDragging(false);
+    }
+  };
+
+  const handleTouchEnd = () => {
+    setIsDragging(false);
+  };
+
+  useEffect(() => {
+    if (sliderRef.current) {
+      const sliderElement = sliderRef.current;
+      sliderElement.addEventListener('mousemove', handleMouseMove);
+      sliderElement.addEventListener('mouseup', handleMouseUp);
+      sliderElement.addEventListener('mouseleave', handleMouseUp);
+      sliderElement.addEventListener('touchmove', handleTouchMove);
+      sliderElement.addEventListener('touchend', handleTouchEnd);
+      return () => {
+        sliderElement.removeEventListener('mousemove', handleMouseMove);
+        sliderElement.removeEventListener('mouseup', handleMouseUp);
+        sliderElement.removeEventListener('mouseleave', handleMouseUp);
+        sliderElement.removeEventListener('touchmove', handleTouchMove);
+        sliderElement.removeEventListener('touchend', handleTouchEnd);
+      };
+    }
+  }, [isDragging]);
 
   return (
     <div
@@ -41,7 +106,10 @@ const Slider = ({ images, heightInRem, widthInRem }: SliderProps) => {
     >
       <div
         id='slider'
+        ref={sliderRef}
         className='group relative h-full w-full overflow-hidden rounded-md bg-blue-400'
+        onMouseDown={handleMouseDown}
+        onTouchStart={handleTouchStart}
       >
         <div
           id='wrapper'
@@ -61,7 +129,8 @@ const Slider = ({ images, heightInRem, widthInRem }: SliderProps) => {
                 fill
                 priority
                 sizes='100vw'
-                className='relative h-full w-full object-cover'
+                className='relative h-full w-full object-cover hover:cursor-grab'
+                draggable={false}
               />
             </div>
           ))}
